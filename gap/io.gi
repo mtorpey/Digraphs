@@ -1539,6 +1539,11 @@ InstallMethod(Digraph6String, "for a digraph",
 [IsDigraph],
 function(digraph)
   local list, adj, n, lenlist, tablen, blist, i, j, pos, block;
+  if IsMultiDigraph(digraph) then
+    ErrorNoReturn("Digraphs: Digraph6String: usage,\n",
+                  "<digraph> must not be a multidigraph,");
+  fi;
+
   list := [];
   adj := OutNeighbours(digraph);
   n := Length(DigraphVertices(digraph));
