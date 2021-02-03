@@ -7,6 +7,8 @@
 
 ### Digraphs package for GAP
 
+Hello from Michael!
+
 #### Copyright (C) 2014-21 by Jan De Beule, Julius Jonušas, James D. Mitchell, Michael Torpey, Wilf A. Wilson et al.
 ## Getting Digraphs
 
