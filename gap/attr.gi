@@ -200,10 +200,10 @@ InstallMethod(DigraphAbsorptionProbabilities,
 "for a digraph",
 [IsDigraph],
 function(D)
-  local scc, is_sink_comp, transient_vertices, i, comp, v, sink_comps,
-        nr_transients, transient_mat, absorption_mat, neighbours, chance, w,
-        w_comp, sink_comp_index, j, N, chances_of_absorption, output, comp_no,
-        c;
+  local scc, quotient, sink_comps, is_sink_comp, transient_comps,
+        transient_vertices, nr_transients, transient_mat, absorption_mat, i, v,
+        neighbours, chance, w, w_comp, sink_comp_index, j, N,
+        chances_of_absorption, output, comp_no, c;
   # No vertices: trivial matrix
   if DigraphNrVertices(D) = 0 then
     return [];
@@ -217,19 +217,12 @@ function(D)
   fi;
 
   # Find the "sink components" (components from which there is no escape)
-  is_sink_comp := ListWithIdenticalEntries(Length(scc.comps), true);
-  transient_vertices := [];
-  for i in [1 .. Length(scc.comps)] do
-    comp := scc.comps[i];
-    for v in comp do
-      if ForAny(OutNeighboursOfVertex(D, v), w -> not w in comp) then
-        is_sink_comp[i] := false;
-        Append(transient_vertices, comp);
-        break;
-      fi;
-    od;
-  od;
-  sink_comps := Positions(is_sink_comp, true);
+  quotient := DigraphRemoveLoops(QuotientDigraph(D, scc.comps));
+  sink_comps := DigraphSinks(quotient);
+  is_sink_comp := BlistList([1 .. Length(scc.comps)], sink_comps);
+  transient_comps := [1 .. Length(scc.comps)];
+  SubtractSet(transient_comps, sink_comps);
+  transient_vertices := SortedList(Concatenation(scc.comps{transient_comps}));
   nr_transients := Length(transient_vertices);
 
   # transient_mat[i][j] is the chance of going
