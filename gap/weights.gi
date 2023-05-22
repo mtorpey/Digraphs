@@ -567,19 +567,19 @@ DIGRAPHS_Edge_Weighted_Johnson := function(digraph)
         od;
     od;
 
-    digraph := EdgeWeightedDigraph(mutableOuts, mutableWeights);
+    digraph         := EdgeWeightedDigraph(mutableOuts, mutableWeights);
     digraphVertices := DigraphVertices(digraph);
 
     distance := EmptyPlist(nrVertices);
-    parents := EmptyPlist(nrVertices);
-    edges := EmptyPlist(nrVertices);
+    parents  := EmptyPlist(nrVertices);
+    edges    := EmptyPlist(nrVertices);
 
     # run dijkstra
     for u in digraphVertices do
-        dijkstra := DIGRAPHS_Edge_Weighted_Dijkstra(digraph, u);
+        dijkstra    := DIGRAPHS_Edge_Weighted_Dijkstra(digraph, u);
         distance[u] := dijkstra.distances;
-        parents[u] := dijkstra.parents;
-        edges[u] := dijkstra.edges;
+        parents[u]  := dijkstra.parents;
+        edges[u]    := dijkstra.edges;
     od;
 
     # correct distances
@@ -935,7 +935,7 @@ end);
 InstallMethod(DigraphFromPaths,
 "for a digraph, and a record", [IsDigraph, IsRecord],
 function(digraph, record)
-    local idx, d, distances, edges, parents, nrVertices, outNeighbours,
+    local idx, distances, edges, parents, nrVertices, outNeighbours,
     u, v;
 
     distances  := record.distances;
@@ -1060,3 +1060,153 @@ function(digraph, subdigraph, options)
    return DotColoredEdgeWeightedDigraph(
     digraph, vertColours, edgeColours, weights);
 end);
+
+# InstallMethod(DigraphMinimumCuts, "for a digraph",
+# [IsDigraph],
+# function(digraph)
+#     local contract, minCut, fastMinCut, KargerStein;
+
+#     contract := function(digraph, options)
+#         local digraphVertices, nrVertices, nrV, nrEdges, i, u, v,
+#         edgeList, outNeigbours, idx, randomEdgeIdx, cuts, edgesCut, parent,
+#         x, y, rank, opts, default, name;
+
+#         default := rec(minV := 2);
+
+#         if IsRecord(options) then
+#             opts := ShallowCopy(options);
+#         else
+#             opts := rec();
+#         fi;
+
+#         for name in RecNames(default) do
+#             if IsBound(opts.(name)) then
+#                 default.(name) := opts.(name);
+#             fi;
+#         od;
+
+#         # weights := EdgeWeights(digraph);
+#         digraphVertices := DigraphVertices(digraph);
+#         nrVertices      := Size(digraphVertices);
+#         nrEdges         := Size(DigraphEdges(digraph));
+
+#         edgeList := [];
+#         for u in digraphVertices do
+#             outNeigbours := OutNeighbors(digraph)[u];
+#             for idx in [1 .. Size(outNeigbours)] do
+#                 v := outNeigbours[idx];  # the out neighbour
+
+#                 Add(edgeList, [u, v]);
+#             od;
+#         od;
+
+#         # sort edge weights by their weight
+#         i := Size(edgeList);
+
+#         parent := [];
+#         rank   := [];
+
+#         for v in [1 .. nrVertices] do
+#             Add(parent, v);
+#             Add(rank, 1);
+#         od;
+
+#         edgesCut := [];
+#         nrV      := nrVertices;
+#         while nrV > default.minV do
+#             randomEdgeIdx := Random([1 .. Size(edgeList)]);
+
+#             u := edgeList[randomEdgeIdx][1];
+#             v := edgeList[randomEdgeIdx][2];
+
+#             x := DIGRAPHS_Find(parent, u);
+#             y := DIGRAPHS_Find(parent, v);
+
+#             if x <> y then
+#                 nrV := nrV - 1;
+#                 DIGRAPHS_Union(parent, rank, x, y);
+#             fi;
+#         od;
+
+#         cuts  := 0;
+
+#         for i in [1 .. nrEdges] do
+#             u := edgeList[i][1];
+#             v := edgeList[i][2];
+
+#             x := DIGRAPHS_Find(parent, u);
+#             y := DIGRAPHS_Find(parent, v);
+
+#             if x <> y then
+#                 Add(edgesCut, [u, v]);
+#                 cuts := cuts + 1;
+#             fi;
+#         od;
+
+#         return rec(cuts := cuts, edgesCut := edgesCut);
+#     end;
+
+#     minCut := function(digraph)
+#         local nrEdges, nrVertices, upperBound, i, cutInfo, edgesCut;
+
+#         nrEdges := Size(DigraphEdges(digraph));
+#         nrVertices := Size(DigraphVertices(digraph));
+
+#         # upperBound := Int(nrVertices *
+#         # (nrVertices - 1) * Log((nrVertices/2), 2));
+#         upperBound := nrVertices;
+
+#         for i in [1 .. upperBound] do
+#             cutInfo := contract(digraph, rec());
+#             if cutInfo.cuts <= nrEdges then
+#                 nrEdges  := cutInfo.cuts;
+#                 edgesCut := cutInfo.edgesCut;
+#             fi;
+#         od;
+
+#         return rec(cuts := nrEdges, edgesCut := edgesCut);
+#     end;
+
+#     fastMinCut := function(digraph)
+#         local nrVertices, g1, g2;
+
+#         nrVertices := Size(DigraphVertices(digraph));
+#         if (nrVertices <= 6) then
+#             return minCut(digraph);
+#         fi;
+
+#         g1 := contract(digraph, rec(minV := 2));
+#         g2 := contract(digraph, rec(minV := 2));
+
+#         if g1.cuts <= g2.cuts then
+#             return rec(cuts := g1.cuts, edgesCut := g1.edgesCut);
+#         else
+#             return rec(cuts := g2.cuts, edgesCut := g2.edgesCut);
+#         fi;
+#     end;
+
+#     KargerStein := function(digraph)
+#         local digraphVertices, nrVertices, nrEdges,
+#         i, upperBound, edgesCut, cutInfo;
+
+#         digraphVertices := DigraphVertices(digraph);
+#         nrVertices      := Size(digraphVertices);
+#         nrEdges         := Size(DigraphEdges(digraph));
+#         edgesCut        := [];
+
+#         # upperBound := Int(nrVertices * Log(nrVertices, 2)/(nrVertices - 1));
+#         upperBound := nrVertices;
+
+#         for i in [1 .. upperBound] do
+#             cutInfo := fastMinCut(digraph);
+#             if cutInfo.cuts <= nrEdges then
+#                 nrEdges  := cutInfo.cuts;
+#                 edgesCut := cutInfo.edgesCut;
+#             fi;
+#         od;
+
+#         return  rec(cuts := nrEdges, edgesCut := edgesCut);
+#     end;
+
+#     return KargerStein(digraph);
+# end);

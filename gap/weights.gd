@@ -26,7 +26,7 @@ DeclareAttribute("DigraphEdgeWeightedShortestPaths", IsDigraph and HasEdgeWeight
 
 # 5. Maximum Flow
 DeclareOperation("DigraphMaximumFlow", [IsDigraph and HasEdgeWeights, IsPosInt, IsPosInt]);
-DeclareAttribute("DigraphMinimumCuts", IsDigraph and HasEdgeWeights);
+DeclareAttribute("DigraphMinimumCuts", IsDigraph);
 
 # 6. Random Edge Weighted Digraph
 DeclareOperation("RandomUniqueEdgeWeightedDigraph",[IsPosInt]);
