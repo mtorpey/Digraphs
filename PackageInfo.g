@@ -387,6 +387,24 @@ Persons := [
     WWWHome        := "https://michael.orlitzky.com/"),
 
   rec(
+    LastName      := "Toner",
+    FirstNames    := "Mark",
+    IsAuthor      := true,
+    IsMaintainer  := false,
+    Email         := "mark.toner@live.com"),
+
+  rec(
+    LastName      := "Tsalakou",
+    FirstNames    := "Maria",
+    IsAuthor      := true,
+    IsMaintainer  := false,
+    Email         := "mt200@st-andrews.ac.uk",
+    WWWHome       := "https://mariatsalakou.github.io/",
+    PostalAddress := _STANDREWSMATHS,
+    Place         := "St Andrews",
+    Institution   := "University of St Andrews"),
+
+  rec(
     LastName       := "Pancer",
     FirstNames     := "Matthew",
     IsAuthor       := true,
