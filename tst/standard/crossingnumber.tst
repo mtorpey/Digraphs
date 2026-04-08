@@ -16,7 +16,7 @@ gap> DIGRAPHS_CompleteDigraphCrossingNumber(D);
 
 # Test for non-Complete Digraph
 gap> D := CompleteBipartiteDigraph(3, 3);
-<immutable complete bipartite digraph with bicomponent sizes 3 and 3>
+<immutable complete bipartite digraph with bicomponents of size 3>
 gap> DIGRAPHS_CompleteDigraphCrossingNumber(D);
 Error, no method found! For debugging hints type ?Recovery from NoMethodFound
 Error, no 2nd choice method found for `DIGRAPHS_CompleteDigraphCrossingNumber'\
